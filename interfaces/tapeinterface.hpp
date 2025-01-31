@@ -1,40 +1,21 @@
-<<<<<<< HEAD
-#ifndef TAPEINTERFACE_HPP
-#define TAPEINTERFACE_HPP
+#ifndef ITAPE_HPP
+#define ITAPE_HPP
 
 #include <cstdint>
 #include <memory>
 
-class TapeInterface{
+class ITape{
+protected:
+    virtual ~ITape() = default;
 public:
-    virtual ~TapeInterface();
-    virtual int32_t read();
-    virtual void write(int32_t data);
-    virtual void moveForward();
-    virtual void moveBackward();
-    virtual void rewindToStart();
-    virtual bool isEnd() const;
-    virtual size_t get_size();
+    virtual int32_t read() = 0;
+    virtual void write(int32_t data) = 0;
+    virtual void moveForward() = 0;
+    virtual void moveBackward() = 0;
+    virtual void rewindToStart() = 0;
+    virtual bool isEnd() const = 0;
+    virtual size_t get_size() = 0;
+    ITape& operator=(const ITape&) = delete;
 };
 
-=======
-#ifndef TAPEINTERFACE_HPP
-#define TAPEINTERFACE_HPP
-
-#include <cstdint>
-#include <memory>
-
-class TapeInterface{
-public:
-    virtual ~TapeInterface();
-    virtual int32_t read();
-    virtual void write(int32_t data);
-    virtual void moveForward();
-    virtual void moveBackward();
-    virtual void rewindToStart();
-    virtual bool isEnd() const;
-    virtual size_t get_size();
-};
-
->>>>>>> 7c37bcd5dbeab3a44a59019d8425f5bfbb5943ae
 #endif

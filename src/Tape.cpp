@@ -1,18 +1,23 @@
-#include "inc/Tape.hpp"
-#include "inc/TapeDelaysConfig.hpp"
+#include "Tape.hpp"
+#include "TapeDelaysConfig.hpp"
 #include <iostream>
 #include <filesystem>
 
 using namespace std;
 
+Tape::Delays Tape::delays;
+
 Tape::Tape(const string& filename){
+    printf("Open file: %s ", filename.c_str());
     file.open(filename, ios::in | ios::out | ios::binary | ios::ate);
     if (!file){
+        printf("File not found! Create: %s", filename.c_str());
         file.open(filename, ios::out);
         file.close();
         file.open(filename, ios::in | ios::out | ios::binary | ios::ate);
     }
     size = filesystem::file_size(filename) / sizeof(int32_t);
+    printf("%s size %d \n", filename.c_str(), size);
     file.seekg(0);
 }
 
