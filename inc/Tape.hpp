@@ -4,12 +4,15 @@
 #include "tapeinterface.hpp"
 #include <fstream>
 #include <thread>
+#include <iostream>
+#include <filesystem>
 
 
 using namespace std;
 
 class Tape : public ITape{
     fstream file;
+    string filename;
     size_t position = 0;
     size_t size;
     
@@ -28,7 +31,8 @@ public:
     Tape(const std::string& filename);
     ~Tape();
 
-    size_t get_size() override;
+    string get_filename();
+    size_t get_size();
     int32_t read() override;
     void write(int32_t data) override;
     void moveForward() override;

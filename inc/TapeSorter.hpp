@@ -7,17 +7,19 @@
 #include <string>
 #include <filesystem>
 
+using namespace std;
+
 class TapeSorter {
     size_t memoryLimit;
     Tape& input;
     Tape& output;
-    std::string tmpDir;
+    string tmpDir;
 
-    void splitAndSort(std::vector<std::string>& tempFiles);
-    void merge(const std::vector<std::string>& files, const std::string& out);
+    void splitAndSort(vector<string>& tempFiles);
+    void merge(const vector<string>& files, const string& out);
 
 public:
-    TapeSorter(size_t memoryLimit, Tape& in, Tape& out, const std::string& tmp);
+    TapeSorter(size_t memoryLimit, Tape& in, Tape& out, const string& tmp);
     void sort();
 };
 

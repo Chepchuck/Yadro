@@ -9,7 +9,6 @@ TapeSorter::TapeSorter(size_t length, Tape& in, Tape& out, const string& tmp)
     tmpDir(move(tmp))
 {}
 
-
 void TapeSorter::splitAndSort(vector<string>& tempFiles) {
     const size_t chunkElements = memoryLimit / sizeof(int32_t);
     vector<int32_t> buffer;
@@ -25,7 +24,7 @@ void TapeSorter::splitAndSort(vector<string>& tempFiles) {
 
         std::sort(buffer.begin(), buffer.end());
 
-        string tempName = tmpDir + "/temp_" + to_string(tempFiles.size()) + "_" + to_string(i);
+        string tempName = tmpDir + "/temp_" + to_string(tempFiles.size()) + ".bin";
 
         tempFiles.push_back(tempName);
 
@@ -73,15 +72,14 @@ void TapeSorter::merge(const vector<string>& files, const string& out){
             pq.push({node.tape->read(), node.tape});
         }
     }
-    printf("Size of tapes: %d", sizeof(tapes));
 }
 
 void TapeSorter::sort(){
     vector<string> tempFiles;
     splitAndSort(tempFiles);
-    merge(tempFiles, "output_merged.bin");
-
-    for (const auto& name : tempFiles){
-        filesystem::remove(name);
-    }
+    merge(tempFiles, output.get_filename());
+    printf("Tape was sorted! Result of sort contains in output.bin.\n");
+    // for (const auto& name : tempFiles){
+    //     filesystem::remove(name);
+    // }
 }

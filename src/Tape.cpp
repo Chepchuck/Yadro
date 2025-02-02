@@ -1,21 +1,18 @@
 #include "Tape.hpp"
 #include "TapeDelaysConfig.hpp"
-#include <iostream>
-#include <filesystem>
-
-using namespace std;
 
 Tape::Delays Tape::delays;
 
 Tape::Tape(const string& filename){
-    printf("Open file: %s ", filename.c_str());
+    printf("Open file: %s.\n ", filename.c_str());
     file.open(filename, ios::in | ios::out | ios::binary | ios::ate);
     if (!file){
-        printf("File not found! Create: %s", filename.c_str());
+        printf("File not found! Create: %s.\n", filename.c_str());
         file.open(filename, ios::out);
         file.close();
         file.open(filename, ios::in | ios::out | ios::binary | ios::ate);
     }
+    this->filename = filename;
     size = filesystem::file_size(filename) / sizeof(int32_t);
     printf("%s size %d \n", filename.c_str(), size);
     file.seekg(0);
@@ -27,6 +24,10 @@ Tape::~Tape() {
 
 size_t Tape::get_size(){
     return size;
+}
+
+string Tape::get_filename(){
+    return filename;
 }
 
 int32_t Tape::read() {
@@ -59,7 +60,7 @@ void Tape::moveForward(){
 }
 
 void Tape::rewindToStart() {
-    applyDelay(delays.rewind);
+    applyDelay(static_cast<uint32_t>(delays.rewind * (position / size)));
     position = 0;
 }
 

@@ -5,7 +5,7 @@
 
 int main(int argc, char* argv[]){
     if (argc < 3){
-        cerr << "Usage: " << argv[0] << " input output";
+        cerr << "Usage: " << argv[0] << " input_filename output_filename\n";
         return -1;
     }
 
