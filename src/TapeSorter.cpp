@@ -1,21 +1,23 @@
 #include "TapeSorter.hpp"
-#include <algorithm>
-#include <queue>
-#include <utility>
 
 TapeSorter::TapeSorter(const size_t memoryLimit, Tape& in, Tape& out, string  tmp)
   : memoryLimit(memoryLimit),
     input(in),
     output(out),
-    tmpDir(std::move(tmp))
+    tmpDir(move(tmp))
 {}
 
 void TapeSorter::splitAndSort(vector<string>& tempFiles) const {
+    // Отвечает за максимальное количество элементов на временной ленте
     const size_t chunkElements = memoryLimit / sizeof(int32_t);
+    // Буффер для временного хранения элементов с ленты
     vector<int32_t> buffer;
 
+    // Проматываем исходную ленту в начало
     input.rewindToStart();
-    int i = 0;
+    /* В цикле последовательно проходимся по элементам исходной ленты и записываем их в буфер,
+    как только достигается максимальное количество (==chunkElements), записываем данные из 
+    буфера в файл временной ленты. Очищаем буффер. Повторяем, пока не закончится исходная лента.*/
     while(!input.isEnd()){
         buffer.clear();
         for (size_t size = 0; size < chunkElements && !input.isEnd(); size++){
@@ -34,10 +36,10 @@ void TapeSorter::splitAndSort(vector<string>& tempFiles) const {
             tempTape.write(num);
             tempTape.moveForward();
         }
-        i++;
     }
 }
 
+// Структура для удобного сравнения в приоритетной очереди
 struct MergeNode{
     int32_t value;
     Tape* tape;
@@ -48,19 +50,29 @@ struct MergeNode{
 };
 
 void TapeSorter::merge(const vector<string>& files, const string& out){
+    // Приоритетная очередь, первый вытаскивается объект с минимальным значением
     priority_queue<MergeNode, vector<MergeNode>, greater<>> pq;
+    // Вспомогательный вектор для хранения ссылок
     vector<unique_ptr<Tape>> tapes;
 
+    /* В цикле поочереди открываем и создаем указатели на временные файлы лент. 
+    Первые значения каждой ленты (они же наименьшие) добавляем в приоритетную очередь
+    вместе с указателем на ленту. */
     for (const auto& name : files) {
         auto tape = make_unique<Tape>(name);
         tape->rewindToStart();
         if (!tape->isEnd()){
             pq.push({tape->read(), tape.get()});
+            // Указатели на ленты добавляем в вектор, чтобы они не уничтожались после итерации цикла
             tapes.emplace_back(move(tape));
         }
     }
     
+    // Открываем файл конечной ленты
     Tape outTape(out);
+    /* В цикле достаем из очереди верхний элемент и записываем его на конечную ленту.
+    Ленту, на которой был элемент, сдвигаем вперед и добавляем значение с текущей позиции 
+    в очередь. Повторяем, пока очередь не закончится. */
     while (!pq.empty()){
         auto [value, tape] = pq.top();
         pq.pop();
@@ -80,6 +92,8 @@ void TapeSorter::sort() const {
     splitAndSort(tempFiles);
     merge(tempFiles, output.get_filename());
     printf("Tape was sorted! Result of sort contains in output.bin.\n");
+
+    /* Можно убрать комменты, чтобы временные файлы удалялись после сортировки */
     // for (const auto& name : tempFiles){
     //     filesystem::remove(name);
     // }

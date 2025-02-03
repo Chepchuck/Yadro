@@ -1,7 +1,8 @@
 import struct
 import random
 
-# Имя файла
+###Генератор бинарников###
+
 filename = 'input.bin'
 
 result = []
@@ -13,12 +14,3 @@ with open(filename, 'wb') as f, open("result.txt", "w") as t:
         f.write(struct.pack('<i', value))  # 4 байта (little-endian)
 
 print(f"Файл '{filename}' успешно создан.")
-
-
-# with open("output_merged", "rb") as f, open("input.bin", "rb") as res:
-#     for _ in range(200):
-#         print(int.from_bytes(f.read(4), "little"), end=" ")
-#     print("\nSorted:")
-#     for _ in range(200):
-#         print(int.from_bytes(res.read(4), "little"), end=" ")
-#     print()

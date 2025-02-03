@@ -1,3 +1,5 @@
+### Сравнение значений с лент ###
+
 inp, out = [], []
 compare_flag = True
 with open("output.bin", "rb") as f, open("input.bin", "rb") as res:
