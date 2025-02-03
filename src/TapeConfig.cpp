@@ -12,7 +12,7 @@ TapeConfig TapeConfig::loadFromFile(const string& path){
     string line;
     /*Читаем построчно файл и разделяем по символу '=', если находим, 
     левое значение используем как ключ, правое - значение
-     и записываем в ранее созданныю мапу, иначе переходим к следующей строчке*/ 
+    и записываем в ранее созданныю мапу, иначе переходим к следующей строчке*/ 
     while (getline(file, line)){
         size_t delim = line.find('=');
         if (delim == string::npos) continue;
@@ -22,6 +22,7 @@ TapeConfig TapeConfig::loadFromFile(const string& path){
         params[key] = value;
     }
     
+    // Проверяем значения мапы, если есть нужные ключи, записываем в поля структуры
     config.read = params.count("read_delay") ? params["read_delay"] : 0;
     config.read = params.count("write_delay") ? params["write_delay"] : 0;
     config.read = params.count("shift_delay") ? params["shift_delay"] : 0;
