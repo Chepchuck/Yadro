@@ -4,7 +4,7 @@
 #include <string>
 
 TapeConfig TapeConfig::loadFromFile(const std::string& path){
-    TapeConfig config;
+    TapeConfig config{};
     std::ifstream file(path);
     std::unordered_map<std::string, uint32_t> params;
 

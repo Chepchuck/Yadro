@@ -1,15 +1,16 @@
 #include "TapeSorter.hpp"
 #include <algorithm>
 #include <queue>
+#include <utility>
 
-TapeSorter::TapeSorter(size_t length, Tape& in, Tape& out, const string& tmp)
-  : memoryLimit(length),
+TapeSorter::TapeSorter(const size_t memoryLimit, Tape& in, Tape& out, string  tmp)
+  : memoryLimit(memoryLimit),
     input(in),
     output(out),
-    tmpDir(move(tmp))
+    tmpDir(std::move(tmp))
 {}
 
-void TapeSorter::splitAndSort(vector<string>& tempFiles) {
+void TapeSorter::splitAndSort(vector<string>& tempFiles) const {
     const size_t chunkElements = memoryLimit / sizeof(int32_t);
     vector<int32_t> buffer;
 
@@ -17,7 +18,7 @@ void TapeSorter::splitAndSort(vector<string>& tempFiles) {
     int i = 0;
     while(!input.isEnd()){
         buffer.clear();
-        for (size_t i = 0; i < chunkElements && !input.isEnd(); i++){
+        for (size_t size = 0; size < chunkElements && !input.isEnd(); size++){
             buffer.push_back(input.read());
             input.moveForward();
         }
@@ -29,7 +30,7 @@ void TapeSorter::splitAndSort(vector<string>& tempFiles) {
         tempFiles.push_back(tempName);
 
         Tape tempTape(tempName);
-        for (int32_t num : buffer){
+        for (const int32_t num : buffer){
             tempTape.write(num);
             tempTape.moveForward();
         }
@@ -47,7 +48,7 @@ struct MergeNode{
 };
 
 void TapeSorter::merge(const vector<string>& files, const string& out){
-    priority_queue<MergeNode, vector<MergeNode>, greater<MergeNode>> pq;
+    priority_queue<MergeNode, vector<MergeNode>, greater<>> pq;
     vector<unique_ptr<Tape>> tapes;
 
     for (const auto& name : files) {
@@ -61,20 +62,20 @@ void TapeSorter::merge(const vector<string>& files, const string& out){
     
     Tape outTape(out);
     while (!pq.empty()){
-        auto node = pq.top();
+        auto [value, tape] = pq.top();
         pq.pop();
 
-        outTape.write(node.value);
+        outTape.write(value);
         outTape.moveForward();
 
-        node.tape->moveForward();
-        if (!node.tape->isEnd()){
-            pq.push({node.tape->read(), node.tape});
+        tape->moveForward();
+        if (!tape->isEnd()){
+            pq.push({tape->read(), tape});
         }
     }
 }
 
-void TapeSorter::sort(){
+void TapeSorter::sort() const {
     vector<string> tempFiles;
     splitAndSort(tempFiles);
     merge(tempFiles, output.get_filename());

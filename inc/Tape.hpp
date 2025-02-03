@@ -16,7 +16,7 @@ class Tape : public ITape{
     size_t position = 0;
     size_t size;
     
-    void applyDelay(uint32_t ms) const{
+    static void applyDelay(const uint32_t ms) {
         this_thread::sleep_for(chrono::microseconds(ms));
     }
 public:
@@ -28,11 +28,12 @@ public:
         uint32_t rewind;
     } delays;
 
-    Tape(const std::string& filename);
-    ~Tape();
+    explicit Tape(const std::string& filename);
+    ~Tape() override;
 
-    string get_filename();
-    size_t get_size();
+    size_t get_size() const;
+    string get_filename() const;
+
     int32_t read() override;
     void write(int32_t data) override;
     void moveForward() override;

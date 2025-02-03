@@ -14,7 +14,7 @@ Tape::Tape(const string& filename){
     }
     this->filename = filename;
     size = filesystem::file_size(filename) / sizeof(int32_t);
-    printf("%s size %d \n", filename.c_str(), size);
+    printf("%s size %llu \n", filename.c_str(), size);
     file.seekg(0);
 }
 
@@ -22,11 +22,11 @@ Tape::~Tape() {
     if (file.is_open()) file.close();
 }
 
-size_t Tape::get_size(){
+size_t Tape::get_size() const{
     return size;
 }
 
-string Tape::get_filename(){
+string Tape::get_filename() const{
     return filename;
 }
 

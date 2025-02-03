@@ -15,12 +15,12 @@ class TapeSorter {
     Tape& output;
     string tmpDir;
 
-    void splitAndSort(vector<string>& tempFiles);
-    void merge(const vector<string>& files, const string& out);
+    void splitAndSort(vector<string>& tempFiles) const;
+    static void merge(const vector<string>& files, const string& out);
 
 public:
-    TapeSorter(size_t memoryLimit, Tape& in, Tape& out, const string& tmp);
-    void sort();
+    TapeSorter(size_t memoryLimit, Tape& in, Tape& out, string  tmp);
+    void sort() const;
 };
 
 #endif
