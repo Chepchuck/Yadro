@@ -1,13 +1,9 @@
 #include "TapeSorter.hpp"
 
-TapeSorter::TapeSorter(const size_t memoryLimit, Tape& in, Tape& out, string  tmp)
-  : memoryLimit(memoryLimit),
-    input(in),
-    output(out),
-    tmpDir(move(tmp))
-{}
 
-void TapeSorter::splitAndSort(vector<string>& tempFiles) const {
+
+template <typename T>
+void TapeSorter<T>::splitAndSort() const {
     // Отвечает за максимальное количество элементов на временной ленте
     const size_t chunkElements = memoryLimit / sizeof(int32_t);
     // Буффер для временного хранения элементов с ленты
@@ -26,12 +22,11 @@ void TapeSorter::splitAndSort(vector<string>& tempFiles) const {
         }
 
         std::sort(buffer.begin(), buffer.end());
-
-        string tempName = tmpDir + "/temp_" + to_string(tempFiles.size()) + ".bin";
-
-        tempFiles.push_back(tempName);
-
-        Tape tempTape(tempName);
+        
+        /* Я предполагаю, что у каждой реальной ленты должен быть хотя бы идентификатор  */
+        auto tempTape = make_unique<T>(tapesPtrs.size());
+        // Сохраняем указатель на ленту для дальнейшего взаимодействия с ней
+        tapesPtrs.emplace_back(move(tempTape));
         for (const int32_t num : buffer){
             tempTape.write(num);
             tempTape.moveForward();
@@ -40,36 +35,31 @@ void TapeSorter::splitAndSort(vector<string>& tempFiles) const {
 }
 
 // Структура для удобного сравнения в приоритетной очереди
+template <typename T>
 struct MergeNode{
     int32_t value;
-    Tape* tape;
+    T* tape;
 
     bool operator>(const MergeNode& other) const{
         return value > other.value;
     }
 };
 
-void TapeSorter::merge(const vector<string>& files, const string& out){
+template <typename T>
+void TapeSorter<T>::merge(){
     // Приоритетная очередь, первый вытаскивается объект с минимальным значением
-    priority_queue<MergeNode, vector<MergeNode>, greater<>> pq;
-    // Вспомогательный вектор для хранения ссылок
-    vector<unique_ptr<Tape>> tapes;
+    priority_queue<MergeNode<T>, vector<MergeNode<T>>, greater<>> pq;
 
     /* В цикле поочереди открываем и создаем указатели на временные файлы лент. 
     Первые значения каждой ленты (они же наименьшие) добавляем в приоритетную очередь
     вместе с указателем на ленту. */
-    for (const auto& name : files) {
-        auto tape = make_unique<Tape>(name);
+    for (const auto &tape : tapesPtrs) {
         tape->rewindToStart();
         if (!tape->isEnd()){
             pq.push({tape->read(), tape.get()});
-            // Указатели на ленты добавляем в вектор, чтобы они не уничтожались после итерации цикла
-            tapes.emplace_back(move(tape));
         }
     }
     
-    // Открываем файл конечной ленты
-    Tape outTape(out);
     /* В цикле достаем из очереди верхний элемент и записываем его на конечную ленту.
     Ленту, на которой был элемент, сдвигаем вперед и добавляем значение с текущей позиции 
     в очередь. Повторяем, пока очередь не закончится. */
@@ -77,8 +67,8 @@ void TapeSorter::merge(const vector<string>& files, const string& out){
         auto [value, tape] = pq.top();
         pq.pop();
 
-        outTape.write(value);
-        outTape.moveForward();
+        output.write(value);
+        output.moveForward();
 
         tape->moveForward();
         if (!tape->isEnd()){
@@ -87,14 +77,14 @@ void TapeSorter::merge(const vector<string>& files, const string& out){
     }
 }
 
-void TapeSorter::sort() const {
-    vector<string> tempFiles;
-    splitAndSort(tempFiles);
-    merge(tempFiles, output.get_filename());
-    printf("Tape was sorted! Result of sort contains in output.bin.\n");
+template <typename T>
+vector<unique_ptr<T>>& TapeSorter<T>::getTapesPointers() const{
+    return &tapesPtrs;
+}
 
-    /* Можно убрать комменты, чтобы временные файлы удалялись после сортировки */
-    // for (const auto& name : tempFiles){
-    //     filesystem::remove(name);
-    // }
+template <typename T>
+void TapeSorter<T>::sort() const {
+    splitAndSort();
+    merge();
+    printf("Tape was sorted!\n");
 }

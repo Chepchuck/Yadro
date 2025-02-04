@@ -19,7 +19,7 @@ int main(int argc, char* argv[]){
     // Открываем конечный файл
     Tape output(argv[2]);
     // Создаем объект сортировщика
-    TapeSorter sorter(input.get_size(), input, output, "tmp");
+    TapeSorter<Tape> sorter(input.get_size(), input, output);
     // Сортируем
     sorter.sort();
     // Готово)

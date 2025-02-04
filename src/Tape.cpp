@@ -6,6 +6,21 @@
 // Выделение памяти для хранения данных о задержках
 Tape::Delays Tape::delays;          
 
+Tape::Tape(size_t id){
+    // Создаем
+    string filename = "tmp/temp_" + to_string(id) + ".bin";
+    // Создаем
+    if (filesystem::exists(filename)){
+        filesystem::remove(filename);
+    }
+    file.open(filename, ios::out);
+    file.close();
+    // Снова открываем только что созданный файл
+    file.open(filename, ios::in | ios::out | ios::binary | ios::ate);
+    this->filename = filename;
+    size = 0;
+}
+
 Tape::Tape(const string& filename){
     printf("Open file: %s.\n ", filename.c_str());
     
@@ -14,12 +29,7 @@ Tape::Tape(const string& filename){
 
     // Если файл не был открыт, создаем и открывем заново с теми же привилегиями и режимом
     if (!file){
-        printf("File not found! Create: %s.\n", filename.c_str());
-        // Создаем
-        file.open(filename, ios::out);      
-        file.close();                                                           
-        // Снова открываем только что созданный файл
-        file.open(filename, ios::in | ios::out | ios::binary | ios::ate);  
+        throw logic_error("File not found!");
     }
     // Сохраняем название
     this->filename = filename;

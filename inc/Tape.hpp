@@ -31,8 +31,10 @@ public:
         uint32_t rewind;
     } delays;
 
+    // Конструктор файлов временных лент
+    Tape(size_t id);
     // Конструктор. Принимает на вход название файла ленты.
-    explicit Tape(const std::string& filename);
+    Tape(const string& filename);
     // Деструктор
     ~Tape() override;
 
