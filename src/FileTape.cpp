@@ -67,10 +67,6 @@ size_t FileTape::get_size() const{
     return size;
 }
 
-string FileTape::get_filename() const{
-    return filename;
-}
-
 int32_t FileTape::read() {
     // Применяем задержку на чтение в мс
     applyDelay(delays.read);        
