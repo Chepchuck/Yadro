@@ -1,5 +1,5 @@
-#ifndef TAPE_HPP
-#define TAPE_HPP
+#ifndef FILETAPE_HPP
+#define FILETAPE_HPP
 
 #include "tapeinterface.hpp"
 #include <fstream>
@@ -11,12 +11,12 @@
 using namespace std;
 
 // Класс, имитирующий работу ленты
-class Tape : public ITape{
+class FileTape : public ITape{
     fstream file;           // Файл входной последовательности 4-байтовых элементов
     string filename;        // Название файла
     size_t position = 0;    // Текущая позиция магнитной головки относительно начала ленты
     size_t size;            // Размер ленты (в элементах)
-    
+
     // Статический метод класса для применения задержек перед каждой операцией
     static void applyDelay(const uint32_t ms) {
         this_thread::sleep_for(chrono::microseconds(ms));
@@ -30,13 +30,14 @@ public:
         uint32_t shift;
         uint32_t rewind;
     } delays;
+    static string tmpDir;
 
     // Конструктор файлов временных лент
-    Tape(size_t id);
+    FileTape();
     // Конструктор. Принимает на вход название файла ленты.
-    Tape(const string& filename);
+    explicit FileTape(const string& filename);
     // Деструктор
-    ~Tape() override;
+    ~FileTape() override;
 
     // Получение данных о размере ленты.
     size_t get_size() const;

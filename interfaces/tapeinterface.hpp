@@ -21,7 +21,6 @@ public:
     virtual void rewindToStart() = 0;
     // Флаг конца ленты
     virtual bool isEnd() const = 0;
-    ITape& operator=(const ITape&) = delete;
 };
 
 #endif

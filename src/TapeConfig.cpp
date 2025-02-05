@@ -1,4 +1,7 @@
 #include "TapeConfig.hpp"
+#include <stdexcept>
+#include <string>
+#include <unordered_map>
 
 /* Реализация методов класса TapeConfig */
 

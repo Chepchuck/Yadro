@@ -6,8 +6,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ../)
 
 add_executable(TapeSort 
     src/main.cpp
-    src/Tape.cpp
+        src/FileTape.cpp
     src/TapeConfig.cpp
-    src/TapeSorter.cpp
 )
 target_include_directories(TapeSort PUBLIC interfaces/ inc/)
